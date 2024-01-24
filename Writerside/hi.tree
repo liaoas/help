@@ -4,14 +4,14 @@
 
 <instance-profile id="hi"
                  name="Spring Batch"
-                 start-page="String.md">
+                 start-page="Introduce.md">
 
-    <toc-element topic="String.md"/>
-    <toc-element topic="Java-Double.md"/>
-    <toc-element topic="读取数据.md"/>
-    <toc-element topic="输出数据.md"/>
-    <toc-element topic="处理数据.md"/>
-    <toc-element topic="监听器.md"/>
-    <toc-element topic="异常处理.md"/>
-    <toc-element topic="任务调度.md"/>
+    <toc-element topic="Introduce.md"/>
+    <toc-element topic="Introduction.md"/>
+    <toc-element topic="Reading Data.md"/>
+    <toc-element topic="Output Data.md"/>
+    <toc-element topic="Data Treating.md"/>
+    <toc-element topic="Monitor.md"/>
+    <toc-element topic="Exception.md"/>
+    <toc-element topic="Job.md"/>
 </instance-profile>
