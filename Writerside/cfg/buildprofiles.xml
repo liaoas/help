@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildprofiles xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-profiles.xsd"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <variables></variables>
+    <build-profile instance="hi">
+        <variables>
+            <noindex-content>true</noindex-content>
+        </variables>
+    </build-profile>
+    <build-profile instance="sb">
+        <variables>
+            <noindex-content>true</noindex-content>
+        </variables>
+    </build-profile>
+
+    <footer>
+        <copyright>Product 2024</copyright>
+        <social type="blog" href=""></social>
+        <social type="twitter" href=""></social>
+    </footer>
+
+</buildprofiles>
