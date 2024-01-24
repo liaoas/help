@@ -1,4 +1,4 @@
-# Data Treating
+# OutputData
 
 Spring Batch 中，ItemReader 接口用于读取数据，ItemWriter 接口用于输出数据。此外，还可以通过 ItemProcessor 接口实现数据的处理。包括：数据校验、数据过滤和数据转换等。数据处理发生在 ItemReader 读取数据之后，ItemWirter 输出数据之前。
 
