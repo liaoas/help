@@ -1,0 +1,443 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2024-01-24T10:09:25.1900012"><meta name="build-number" content="${buildNumber}">       <title>监听器 | Spring Batch</title><script id="virtual-toc-data" type="application/json">[{"id":"b092a854_714","level":0,"title":"项目搭建","anchor":"#b092a854_714"},{"id":"b092a854_719","level":0,"title":"启动类","anchor":"#b092a854_719"},{"id":"b092a854_724","level":0,"title":"数据库准备","anchor":"#b092a854_724"},{"id":"b092a854_727","level":0,"title":"项目配置","anchor":"#b092a854_727"},{"id":"b092a854_731","level":0,"title":"监听器","anchor":"#b092a854_731"},{"id":"job","level":0,"title":"接口实现 Job 驱动器","anchor":"#job"},{"id":"step","level":0,"title":"注解实现 Step 驱动器","anchor":"#step"},{"id":"chunk","level":0,"title":"Chunk 监听器","anchor":"#chunk"},{"id":"itemreader","level":0,"title":"ItemReader 监听器","anchor":"#itemreader"},{"id":"itemprocess","level":0,"title":"ItemProcess 监听器","anchor":"#itemprocess"},{"id":"itemwriter","level":0,"title":"ItemWriter 监听器","anchor":"#itemwriter"},{"id":"b092a854_766","level":0,"title":"聚合监听器","anchor":"#b092a854_766"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="监听器 | Spring Batch"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Spring Batch Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="监听器.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="监听器 | Spring Batch"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "监听器.html#webpage", "url": "监听器.html", "name": "监听器 | Spring Batch", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Spring Batch Help" }</script><!-- End Schema.org --></head>      <body data-id="监听器" data-main-title="监听器" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Spring Batch  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="监听器"   id="监听器.md">监听器</h1>  <p id="b092a854_678">Spring Batch 提供了多种监听器 <span class="control" id="b092a854_679">Listener</span> ，用于在任务处理过程中触发我们的逻辑代码。常用的监听器根据粒度从粗到细分别有： <span class="control" id="b092a854_680">Job</span>级别 <code class="code" id="b092a854_681">JobExecutionListener</code>、 <span class="control" id="b092a854_682">Step</span> 级别 <code class="code" id="b092a854_683">StepExecutionListener</code>、 <span class="control" id="b092a854_684">Chunk</span> 监听器 <code class="code" id="b092a854_685">ChunkListener</code>、 <span class="control" id="b092a854_686">ItmeReader</span> 监听器 <code class="code" id="b092a854_687">ItemReadListener</code>、 <span class="control" id="b092a854_688">ItemWriter</span> 监听器 <code class="code" id="b092a854_689">ItemWriterListener</code> 和 <span class="control" id="b092a854_690">ItemProcessor</span>监听器 <code class="code" id="b092a854_691">ItemProcessListener</code> 等。具体可以参考下表：</p><div class="table-wrapper"><table class="wide" id="b092a854_692"><thead><tr class="ijRowHead" id="b092a854_693"><th id="b092a854_694"><p>监听器</p></th><th id="b092a854_695"><p>具体说明</p></th></tr></thead><tbody><tr id="b092a854_696"><td id="b092a854_697"><p>JobExecutionListener</p></td><td id="b092a854_698"><p>在 Job 开始之前（befpreJob）和之后（aflerJob）触发</p></td></tr><tr id="b092a854_699"><td id="b092a854_700"><p>StepExecutionListener</p></td><td id="b092a854_701"><p>在 Step 开始之前（beforeStep）和之后（afterStep）触发</p></td></tr><tr id="b092a854_702"><td id="b092a854_703"><p>ChunkListener</p></td><td id="b092a854_704"><p>在 Chunk 开始之前（beforeChunk)，之后（afterChunk）和错误后(afterChunkError）触发</p></td></tr><tr id="b092a854_705"><td id="b092a854_706"><p>ItemReadListener</p></td><td id="b092a854_707"><p>在 Reader 开始之前（beforeRead），之后（afterRead）和错误之后（onReadError）触发</p></td></tr><tr id="b092a854_708"><td id="b092a854_709"><p>ItemProcessListener</p></td><td id="b092a854_710"><p>在 Processor 开始之前（beforeProcess），之后(afterProcess）和错误之后（onProcessError）触发</p></td></tr><tr id="b092a854_711"><td id="b092a854_712"><p>ItemWriterListener</p></td><td id="b092a854_713"><p>在 Writer 开始之前（beforeWrite），之后（afterWrite）和错误之后（onWriteError）触发</p></td></tr></tbody></table></div><section class="chapter"><h2 id="b092a854_714" data-toc="b092a854_714"   >项目搭建</h2><p id="b092a854_715">新建一个 Spring Boot 项目 版本为 <code class="code" id="b092a854_716">2.7.12-SNAPSHOT</code> ，项目名称为： <code class="code" id="b092a854_717">spring-boot-batch-listener</code> ，Maven 依赖项如下：</p><div class="code-block" data-lang="markup"         >
+			&lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-batch&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;mysql&lt;/groupId&gt;
+            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+            &lt;version&gt;8.0.32&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+</div></section><section class="chapter"><h2 id="b092a854_719" data-toc="b092a854_719"   >启动类</h2><p id="b092a854_720"><code class="code" id="b092a854_721">Spring Boot</code> 启动类添加 <code class="code" id="b092a854_722">@EnableBatchProcessing</code></p><div class="code-block" data-lang="java"         >
+@EnableBatchProcessing
+@SpringBootApplication
+public class AppApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
+    }
+
+}
+</div></section><section class="chapter"><h2 id="b092a854_724" data-toc="b092a854_724"   >数据库准备</h2><p id="b092a854_725">准备一个 MySQL 数据库，用于持久化 Spring Batch 的任务，新建一个数据库，数据库命名为 <code class="code" id="b092a854_726">spring_batch_test</code> 并导入 Spring Batch 所用到的数据表，org.springframework.batch.core目录下的schema-mysql.sql文件：</p></section><section class="chapter"><h2 id="b092a854_727" data-toc="b092a854_727"   >项目配置</h2><p id="b092a854_728">配置项目的数据库连接信息如下：</p><div class="code-block" data-lang="yaml"         >
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/spring_batch_test
+    username: root
+    password: liao
+
+</div><p id="b092a854_730">至此，基本框架搭建好了，下面开始配置一个简单的任务。</p></section><section class="chapter"><h2 id="b092a854_731" data-toc="b092a854_731"   >监听器</h2><p id="b092a854_732">每种监听器可以通过一下两种方式使用： <span class="control" id="b092a854_733">接口实现</span> 和 <span class="control" id="b092a854_734">注解实现</span></p></section><section class="chapter"><h2 id="job" data-toc="job"   >接口实现 Job 驱动器</h2><p id="b092a854_735">新建 <code class="code" id="b092a854_736">MyJobExecutionListener</code> 类实现 <code class="code" id="b092a854_737">JobExecutionListener</code> 用以实现 Job 监听器：</p><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ * 通过接口实现 Job 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyJobExecutionListener implements JobExecutionListener {
+
+    @Override
+    public void beforeJob(JobExecution jobExecution) {
+        System.out.println(&quot;Job 开始之前: &quot; + jobExecution.getJobInstance().getJobName());
+    }
+
+    @Override
+    public void afterJob(JobExecution jobExecution) {
+        System.out.println(&quot;Job 开始之后: &quot; + jobExecution.getJobInstance().getJobName());
+    }
+}
+</div></section><section class="chapter"><h2 id="step" data-toc="step"   >注解实现 Step 驱动器</h2><p id="b092a854_739">通过注解的方式不需要实现接口，只需要在对应的方法上新增 <code class="code" id="b092a854_740">@BeforeStep</code><span class="emphasis" id="b092a854_741">、</span><code class="code" id="b092a854_742">@AfterStep</code> 注解即可</p><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ * 通过注解实现 Step 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyStepExecutionListener {
+
+    /**
+     * 通过注解实现监听器，函数命名 必须依照 注解的注释说明的固定函数名称
+     * 如  beforeStep
+     */
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        System.out.println(&quot;Step 开始之前: &quot; + stepExecution.getStepName());
+    }
+
+    @AfterStep
+    public void afterStep(StepExecution stepExecution) {
+        System.out.println(&quot;Step 开始之后 : &quot; + stepExecution.getStepName());
+    }
+}
+</div><p id="b092a854_744">方法名称要符合注解的要求，如 <code class="code" id="b092a854_745">@BeforeStep</code> 注解方法名称就要为 <code class="code" id="b092a854_746">beforeStep</code></p><div class="code-block" data-lang="java"         >
+package org.springframework.batch.core.annotation;
+
+/**
+ * Marks a method to be called before a {@link Step} is executed, which comes
+ * after a {@link StepExecution} is created and persisted, but before the first
+ * item is read. &lt;br&gt;
+ * &lt;br&gt;
+ * Expected signature: void beforeStep({@link StepExecution} stepExecution)
+ * 
+ * @author Lucas Ward
+ * @since 2.0
+ * @see StepExecutionListener
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface BeforeStep {
+
+}
+</div><p id="b092a854_748">源码注释所示：Expected signature: void <span class="control" id="b092a854_749">beforeStep</span> ({@link StepExecution} stepExecution)</p><p id="b092a854_750">继续创建 Chunk 监听器、ItemReader 监听器、ItemProcess 监听器、ItemWriter 监听器</p></section><section class="chapter"><h2 id="chunk" data-toc="chunk"   >Chunk 监听器</h2><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ * 通过接口实现 Chunk 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyChunkListener implements ChunkListener {
+
+    @Override
+    public void beforeChunk(ChunkContext context) {
+        System.out.println(&quot;chunk 开始之前 : &quot; + context.getStepContext().getStepName());
+    }
+
+    @Override
+    public void afterChunk(ChunkContext context) {
+        System.out.println(&quot;chunk 开始之后 : &quot; + context.getStepContext().getStepName());
+    }
+
+    @Override
+    public void afterChunkError(ChunkContext context) {
+        System.out.println(&quot;chunk error 之后 : &quot; + context.getStepContext().getStepName());
+    }
+}
+</div></section><section class="chapter"><h2 id="itemreader" data-toc="itemreader"   >ItemReader 监听器</h2><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ * 通过接口实现 ItemReader 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyItemReaderListener implements ItemReadListener&lt;String&gt; {
+    @Override
+    public void beforeRead() {
+        System.out.println(&quot;ItemReader 开始之前 &quot;);
+    }
+
+    @Override
+    public void afterRead(String item) {
+        System.out.println(&quot;ItemReader 开始之后 : &quot; + item);
+    }
+
+    @Override
+    public void onReadError(Exception ex) {
+        System.out.println(&quot;ItemReader 错误之后 : &quot; + ex.getMessage());
+    }
+}
+</div></section><section class="chapter"><h2 id="itemprocess" data-toc="itemprocess"   >ItemProcess 监听器</h2><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ * 通过接口实现 Process 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyItemProcessListener implements ItemProcessListener&lt;String, String&gt; {
+
+    @Override
+    public void beforeProcess(String item) {
+        System.out.println(&quot;process 开始之前 : &quot; + item);
+    }
+
+    @Override
+    public void afterProcess(String item, String result) {
+        System.out.println(&quot;process 开始之后 : &quot; + item + &quot; result: &quot; + result);
+    }
+
+    @Override
+    public void onProcessError(String item, Exception e) {
+        System.out.println(&quot;process 错误之后 : &quot; + item + &quot; , error message: &quot; + e.getMessage());
+    }
+}
+</div></section><section class="chapter"><h2 id="itemwriter" data-toc="itemwriter"   >ItemWriter 监听器</h2><div class="code-block" data-lang="java"         >
+package com.liao.listener;
+
+/**
+ * &lt;p&gt;
+ *  通过接口实现 ItemWriter 监听器
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Component
+public class MyItemWriterListener implements ItemWriteListener&lt;String&gt; {
+
+    @Override
+    public void beforeWrite(List&lt;? extends String&gt; items) {
+        System.out.println(&quot;ItemWriter 开始之前 : &quot; + items);
+    }
+
+    @Override
+    public void afterWrite(List&lt;? extends String&gt; items) {
+        System.out.println(&quot;ItemWriter 开始之后 : &quot; + items);
+    }
+
+    @Override
+    public void onWriteError(Exception exception, List&lt;? extends String&gt; items) {
+        System.out.println(&quot;ItemWriter 错误之后 : &quot; + items + &quot; , error message: &quot; + exception.getMessage());
+    }
+}
+</div><p id="b092a854_755">准备好上述监听器，然后新建监听器任务测试类 <code class="code" id="b092a854_756">ListenerTestJobDemo</code> 用于测试监听器，代码如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 监听器测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-12
+ */
+@Configuration
+public class ListenerTestJobDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private MyJobExecutionListener myJobExecutionListener;
+
+    @Autowired
+    private MyStepExecutionListener myStepExecutionListener;
+
+    @Autowired
+    private MyChunkListener myChunkListener;
+
+    @Autowired
+    private MyItemReaderListener myItemReaderListener;
+
+    @Autowired
+    private MyItemProcessListener myItemProcessListener;
+
+    @Autowired
+    private MyItemWriterListener myItemWriterListener;
+
+    @Bean
+    public Job listenerTestJob(@Qualifier(&quot;listenerTestStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;listenerTestJob&quot;)
+                .start(step)
+                .listener(myJobExecutionListener)
+                .build();
+    }
+
+    @Bean(&quot;listenerTestStep&quot;)
+    public Step listenerTestStep(@Qualifier(&quot;reader&quot;) ItemReader&lt;String&gt; reader,
+                                 @Qualifier(&quot;processor&quot;) ItemProcessor&lt;String, String&gt; processor) {
+        return stepBuilderFactory.get(&quot;ListenerTestStep&quot;)
+                .listener(myStepExecutionListener)
+                .&lt;String, String&gt;chunk(2)
+                .faultTolerant()
+                .listener(myChunkListener)
+                .reader(reader)
+                .listener(myItemReaderListener)
+                .processor(processor)
+                .listener(myItemProcessListener)
+                .writer(list -&gt; list.forEach(System.out::println))
+                .listener(myItemWriterListener)
+                .build();
+    }
+
+    @Bean(&quot;reader&quot;)
+    public ItemReader&lt;String&gt; reader() {
+        List&lt;String&gt; data = Arrays.asList(&quot;java&quot;, &quot;c++&quot;, &quot;javascript&quot;, &quot;python&quot;);
+        return new SimpleReader(data);
+    }
+
+    @Bean(&quot;processor&quot;)
+    public ItemProcessor&lt;String, String&gt; processor() {
+        return item -&gt; item + &quot; language&quot;;
+    }
+
+}
+
+class SimpleReader implements ItemReader&lt;String&gt; {
+    private final Iterator&lt;String&gt; iterator;
+
+    public SimpleReader(List&lt;String&gt; data) {
+        this.iterator = data.iterator();
+    }
+
+    @Override
+    public String read() throws ParseException, NonTransientResourceException {
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+}
+</div><p id="b092a854_758">运行代码，运行结果如下所示：</p><div class="code-block" data-lang="java"         >
+2023-07-12 16:38:35.180  INFO 63328 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerTestJob1689151114649]] launched with the following parameters: [{}]
+Job 开始之前: listenerTestJob1689151114649
+2023-07-12 16:38:35.206  INFO 63328 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [ListenerTestStep]
+Step 开始之前: ListenerTestStep
+chunk 开始之前 : ListenerTestStep
+ItemReader 开始之前 
+ItemReader 开始之后 : java
+ItemReader 开始之前 
+ItemReader 开始之后 : c++
+process 开始之前 : java
+process 开始之后 : java result: java language
+process 开始之前 : c++
+process 开始之后 : c++ result: c++ language
+ItemWriter 开始之前 : [java language, c++ language]
+java language
+c++ language
+ItemWriter 开始之后 : [java language, c++ language]
+chunk 开始之后 : ListenerTestStep
+chunk 开始之前 : ListenerTestStep
+ItemReader 开始之前 
+ItemReader 开始之后 : javascript
+ItemReader 开始之前 
+ItemReader 开始之后 : python
+process 开始之前 : javascript
+process 开始之后 : javascript result: javascript language
+process 开始之前 : python
+process 开始之后 : python result: python language
+ItemWriter 开始之前 : [javascript language, python language]
+javascript language
+python language
+ItemWriter 开始之后 : [javascript language, python language]
+chunk 开始之后 : ListenerTestStep
+chunk 开始之前 : ListenerTestStep
+ItemReader 开始之前 
+chunk 开始之后 : ListenerTestStep
+Step 开始之后 : ListenerTestStep
+2023-07-12 16:38:35.235  INFO 63328 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [ListenerTestStep] executed in 28ms
+Job 开始之后: listenerTestJob1689151114649
+2023-07-12 16:38:35.243  INFO 63328 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerTestJob1689151114649]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 50ms
+</div><p id="b092a854_760">从上面的运行结果我们可以看出：</p><ol class="list _decimal" id="b092a854_761" type="1"><li class="list__item" id="b092a854_762"><p>证实了<code class="code" id="b092a854_763">chunk(2)</code> 表示每一批处理2个数据块；</p></li><li class="list__item" id="b092a854_764"><p>Step里的执行顺序是 <code class="code" id="b092a854_765">read -&gt; process -&gt; writer</code></p></li></ol></section><section class="chapter"><h2 id="b092a854_766" data-toc="b092a854_766"   >聚合监听器</h2><p id="b092a854_767">每种监听器可以通过对应的聚合类组合在一起，比如有多个 <code class="code" id="b092a854_768">JobExecutionListener</code> ，则可以使用 <code class="code" id="b092a854_769">CompositeJobExecutionListener</code> 聚合起来。上述介绍的监听器均有与之对应的 <code class="code" id="b092a854_770">CompositeXXXListener</code> 聚合类，这里只演示 <code class="code" id="b092a854_771">CompositeJobExecutionListener</code> ，其余的大致一样。</p><p id="b092a854_772">新建聚合监听器测试类 <code class="code" id="b092a854_773">CompositeJobExecutionListenerJobDemo</code> 用于测试：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 测试监听器聚合
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-12
+ */
+@Configuration
+public class CompositeJobExecutionListenerJobDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job compositeJobExecutionListenerJob(@Qualifier(&quot;compositeJobExecutionListener&quot;) CompositeJobExecutionListener compositeJobExecutionListener,
+                                                @Qualifier(&quot;compositeJobExecutionListenerStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;compositeJobExecutionListenerJob&quot;)
+                .start(step)
+                .listener(compositeJobExecutionListener)
+                .build();
+    }
+
+    @Bean(&quot;compositeJobExecutionListenerStep&quot;)
+    public Step step() {
+        return stepBuilderFactory.get(&quot;compositeJobExecutionListenerStep&quot;)
+                .tasklet(((contribution, chunkContext) -&gt; {
+                    System.out.println(&quot;执行步骤&quot;);
+                    return RepeatStatus.FINISHED;
+                })).build();
+    }
+
+    @Bean(&quot;compositeJobExecutionListener&quot;)
+    public CompositeJobExecutionListener compositeJobExecutionListener() {
+        CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
+
+        JobExecutionListener jobExecutionListenerOne = new JobExecutionListener() {
+
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                System.out.println(&quot;任务监听器One，job 开始之前 : &quot; + jobExecution.getJobInstance().getJobName());
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                System.out.println(&quot;任务监听器One，job 开始之后 : &quot; + jobExecution.getJobInstance().getJobName());
+            }
+        };
+
+        JobExecutionListener jobExecutionListenerTwo = new JobExecutionListener() {
+
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                System.out.println(&quot;任务监听器Two，job 开始之前 : &quot; + jobExecution.getJobInstance().getJobName());
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                System.out.println(&quot;任务监听器Two，job 开始之后 : &quot; + jobExecution.getJobInstance().getJobName());
+            }
+        };
+
+        listener.setListeners(Arrays.asList(jobExecutionListenerOne, jobExecutionListenerTwo));
+
+        return listener;
+    }
+}
+</div><p id="b092a854_775">启动项目控制台打印信息如下：</p><div class="code-block" data-lang="java"         >
+2023-07-12 17:22:53.161  INFO 60808 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=compositeJobExecutionListenerJob]] launched with the following parameters: [{}]
+任务监听器One，job 开始之前 : compositeJobExecutionListenerJob
+任务监听器Two，job 开始之前 : compositeJobExecutionListenerJob
+2023-07-12 17:22:53.203  INFO 60808 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [compositeJobExecutionListenerStep]
+执行步骤
+2023-07-12 17:22:53.230  INFO 60808 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [compositeJobExecutionListenerStep] executed in 27ms
+任务监听器Two，job 开始之后 : compositeJobExecutionListenerJob
+任务监听器One，job 开始之后 : compositeJobExecutionListenerJob
+2023-07-12 17:22:53.244  INFO 60808 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=compositeJobExecutionListenerJob]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 58ms
+2023-07-12 17:22:53.310  INFO 60808 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerTestJob]] launched with the following parameters: [{}]
+Job 开始之前: listenerTestJob
+2023-07-12 17:22:53.320  INFO 60808 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Step already complete or not restartable, so no action to execute: StepExecution: id=278, version=5, name=ListenerTestStep, status=COMPLETED, exitStatus=COMPLETED, readCount=4, filterCount=0, writeCount=4 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=3, rollbackCount=0, exitDescription=
+Job 开始之后: listenerTestJob
+2023-07-12 17:22:53.325  INFO 60808 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerTestJob]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 10ms
+</div></section><div class="last-modified"> Last modified: 24 一月 2024</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">  <a class="navigation-links__prev" href="处理数据.html">处理数据</a>   <a class="navigation-links__next" href="异常处理.html">异常处理</a>  </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.js"></script></body></html>

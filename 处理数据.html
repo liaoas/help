@@ -1,0 +1,421 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2024-01-24T10:09:25.1900012"><meta name="build-number" content="${buildNumber}">       <title>处理数据 | Spring Batch</title><script id="virtual-toc-data" type="application/json">[{"id":"fe8a81b4_610","level":0,"title":"项目搭建","anchor":"#fe8a81b4_610"},{"id":"fe8a81b4_615","level":0,"title":"启动类","anchor":"#fe8a81b4_615"},{"id":"fe8a81b4_620","level":0,"title":"数据库准备","anchor":"#fe8a81b4_620"},{"id":"fe8a81b4_623","level":0,"title":"项目配置","anchor":"#fe8a81b4_623"},{"id":"fe8a81b4_626","level":0,"title":"实体类","anchor":"#fe8a81b4_626"},{"id":"fe8a81b4_628","level":0,"title":"模拟数据","anchor":"#fe8a81b4_628"},{"id":"fe8a81b4_634","level":0,"title":"格式校验","anchor":"#fe8a81b4_634"},{"id":"jsr-303","level":0,"title":"使用JSR-303校验","anchor":"#jsr-303"},{"id":"fe8a81b4_664","level":0,"title":"数据过滤","anchor":"#fe8a81b4_664"},{"id":"fe8a81b4_672","level":0,"title":"数据转换","anchor":"#fe8a81b4_672"},{"id":"fe8a81b4_681","level":0,"title":"聚合处理","anchor":"#fe8a81b4_681"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="处理数据 | Spring Batch"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Spring Batch Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="处理数据.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="处理数据 | Spring Batch"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "处理数据.html#webpage", "url": "处理数据.html", "name": "处理数据 | Spring Batch", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Spring Batch Help" }</script><!-- End Schema.org --></head>      <body data-id="处理数据" data-main-title="处理数据" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Spring Batch  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="处理数据"   id="处理数据.md">处理数据</h1>  <p id="fe8a81b4_609">Spring Batch 中，ItemReader 接口用于读取数据，ItemWriter 接口用于输出数据。此外，还可以通过 ItemProcessor 接口实现数据的处理。包括：数据校验、数据过滤和数据转换等。数据处理发生在 ItemReader 读取数据之后，ItemWirter 输出数据之前。</p><section class="chapter"><h2 id="fe8a81b4_610" data-toc="fe8a81b4_610"   >项目搭建</h2><p id="fe8a81b4_611">新建一个 Spring Boot 项目 版本为 <code class="code" id="fe8a81b4_612">2.7.12-SNAPSHOT</code> ，项目名称为： <code class="code" id="fe8a81b4_613">spring-boot-batch-processor</code> ，Maven 依赖项如下：</p><div class="code-block" data-lang="markup"         >
+				&lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-batch&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;mysql&lt;/groupId&gt;
+            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+            &lt;version&gt;8.0.32&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+</div></section><section class="chapter"><h2 id="fe8a81b4_615" data-toc="fe8a81b4_615"   >启动类</h2><p id="fe8a81b4_616"><code class="code" id="fe8a81b4_617">Spring Boot</code> 启动类添加 <code class="code" id="fe8a81b4_618">@EnableBatchProcessing</code></p><div class="code-block" data-lang="java"         >
+@EnableBatchProcessing
+@SpringBootApplication
+public class AppApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
+    }
+
+}
+</div></section><section class="chapter"><h2 id="fe8a81b4_620" data-toc="fe8a81b4_620"   >数据库准备</h2><p id="fe8a81b4_621">准备一个 MySQL 数据库，用于持久化 Spring Batch 的任务，新建一个数据库，数据库命名为 <code class="code" id="fe8a81b4_622">spring_batch_test</code> 并导入 Spring Batch 所用到的数据表，org.springframework.batch.core目录下的schema-mysql.sql文件：</p></section><section class="chapter"><h2 id="fe8a81b4_623" data-toc="fe8a81b4_623"   >项目配置</h2><p id="fe8a81b4_624">配置项目的数据库连接信息如下：</p><div class="code-block" data-lang="yaml"         >
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/spring_batch_test
+    username: root
+    password: liao
+
+</div></section><section class="chapter"><h2 id="fe8a81b4_626" data-toc="fe8a81b4_626"   >实体类</h2><div class="code-block" data-lang="java"         >
+package com.liao.entity;
+
+/**
+ * &lt;p&gt;
+ *
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-06-05
+ */
+public class TestData {
+    private int id;
+    private String field1;
+    private String field2;
+    private String field3;
+		// get,set,toString略
+}
+</div></section><section class="chapter"><h2 id="fe8a81b4_628" data-toc="fe8a81b4_628"   >模拟数据</h2><div class="code-block" data-lang="java"         >
+package com.liao.reader;
+
+/**
+ * &lt;p&gt;
+ *
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-06
+ */
+public class ItemReaderConfigure {
+
+    @Bean
+    public ListItemReader&lt;TestData&gt; simpleReader() {
+        List&lt;TestData&gt; data = new ArrayList&lt;&gt;();
+        TestData testData1 = new TestData();
+        testData1.setId(1);
+        testData1.setField1(&quot;11&quot;);
+        testData1.setField2(&quot;12&quot;);
+        testData1.setField3(&quot;13&quot;);
+        data.add(testData1);
+        TestData testData2 = new TestData();
+        testData2.setId(2);
+        testData2.setField1(&quot;21&quot;);
+        testData2.setField2(&quot;22&quot;);
+        testData2.setField3(&quot;23&quot;);
+        data.add(testData2);
+        TestData testData3 = new TestData();
+        testData2.setId(3);
+        testData2.setField1(&quot;21&quot;);
+        testData2.setField2(&quot;22&quot;);
+        testData2.setField3(&quot;&quot;);
+        data.add(testData3);
+        return new ListItemReader&lt;&gt;(data);
+    }
+}
+</div><p id="fe8a81b4_630">上述代码注册了一个 <code class="code" id="fe8a81b4_631">ListItemReader&lt;TestDate&gt;</code> 类型的 <code class="code" id="fe8a81b4_632">Bean</code> 用作后续测试的数据源</p><p id="fe8a81b4_633">至此，基本框架搭建好了，下面开始配置一个简单的任务。</p></section><section class="chapter"><h2 id="fe8a81b4_634" data-toc="fe8a81b4_634"   >格式校验</h2><p id="fe8a81b4_635"><code class="code" id="fe8a81b4_636">ItemProcessor</code> 的实现类 <code class="code" id="fe8a81b4_637">ValidatingItemProcessor</code> 用于数据格式校验。新建测试类 <code class="code" id="fe8a81b4_638">ValidatingItemProcessorDemo</code> 测试 <code class="code" id="fe8a81b4_639">Spring Batch</code> 数据格式校验</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 数据校验测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-06
+ */
+@Configuration
+public class ValidatingItemProcessorDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ListItemReader&lt;TestData&gt; listItemReader;
+
+    @Bean
+    public Job validatingItemProcessorJob(@Qualifier(&quot;validatingItemProcessorStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;validatingItemProcessorJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;validatingItemProcessorStep&quot;)
+    public Step validatingItemProcessorStep(@Qualifier(&quot;validatingItemProcessor&quot;) ValidatingItemProcessor&lt;TestData&gt; processor) {
+        return stepBuilderFactory.get(&quot;validatingItemProcessor&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(listItemReader)
+                .processor(processor)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;validatingItemProcessor&quot;)
+    public ValidatingItemProcessor&lt;TestData&gt; validatingItemProcessor() {
+        ValidatingItemProcessor&lt;TestData&gt; processor = new ValidatingItemProcessor&lt;&gt;();
+
+        processor.setValidator(value -&gt; {
+            if (&quot;&quot;.equals(value.getField3())) {
+                throw new ValidationException(&quot;field3 的值不合法&quot;);
+            }
+        });
+
+        return processor;
+    }
+}
+</div><p id="fe8a81b4_641">通过 <code class="code" id="fe8a81b4_642">ValidatingItemProcessor</code> 对 ItemReader 读取的每一条数据进行校验，如果 field3 的值为空的话，则抛出 <code class="code" id="fe8a81b4_643">ValidationException(&quot;field3 的值不合法&quot;)</code> 异常。 <code class="code" id="fe8a81b4_644">ItemProcessor</code> 通过建造者模式的 <code class="code" id="fe8a81b4_645">processor()</code> 设置。</p><p id="fe8a81b4_646">启动项目，控制台打印如下：</p><div class="code-block" data-lang="yaml"         >
+2023-07-06 17:13:39.382  INFO 97500 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [validatingItemProcessor]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+2023-07-06 17:13:39.402 ERROR 97500 --- [           main] o.s.batch.core.step.AbstractStep         : Encountered an error executing step validatingItemProcessor in job validatingItemProcessorJob1688634818833
+
+org.springframework.batch.item.validator.ValidationException: field3 的值不合法
+	at com.liao.job.ValidatingItemProcessorDemo.lambda$validatingItemProcessor$1(ValidatingItemProcessorDemo.java:59) ~[classes/:na]
+	at org.springframework.batch.item.validator.ValidatingItemProcessor.process(ValidatingItemProcessor.java:84) ~[spring-batch-infrastructure-4.3.8.jar:4.3.8]
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.doProcess(SimpleChunkProcessor.java:134) ~[spring-batch-core-4.3.8.jar:4.3.8]
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.transform(SimpleChunkProcessor.java:319) ~[spring-batch-core-4.3.8.jar:4.3.8]
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.process(SimpleChunkProcessor.java:210) ~[spring-batch-core-4.3.8.jar:4.3.8]
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:77) ~[spring-batch-core-4.3.8.jar:4.3.8]
+</div><p id="fe8a81b4_648">上述测试代码在运行过程中抛出了预期的异常。</p></section><section class="chapter"><h2 id="jsr-303" data-toc="jsr-303"   >使用JSR-303校验</h2><p id="fe8a81b4_649">除了上述方法外，还可以使用 <code class="code" id="fe8a81b4_650">BeanValidatingItemProcessor</code> 校验使用JSR-303注解来标记实体类。如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.entity;
+
+/**
+ * &lt;p&gt;
+ *
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-06-05
+ */
+public class TestData {
+    private int id;
+    private String field1;
+    private String field2;
+		@NotBlank
+    private String field3;
+		// get,set,toString略
+}
+</div><p id="fe8a81b4_652">上述 <code class="code" id="fe8a81b4_653">@NotBlank</code> 注解需要在新增如下 <code class="code" id="fe8a81b4_654">Maven</code> 依赖：</p><div class="code-block" data-lang="markup"         >
+&lt;dependency&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</div><p id="fe8a81b4_656">新建测试类 <code class="code" id="fe8a81b4_657">BeanValidatingItemProcessorDemo</code></p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * 测试 Spring Batch 使用 JSR-303 注解来校验数据
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Configuration
+public class BeanValidatingItemProcessorDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ListItemReader&lt;TestData&gt; listItemReader;
+
+    @Bean
+    public Job beanValidatingItemProcessorJob(@Qualifier(&quot;beanValidatingItemProcessorStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;beanValidatingItemProcessorJob&quot; + System.currentTimeMillis())
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;beanValidatingItemProcessorStep&quot;)
+    public Step beanValidatingItemProcessorStep(@Qualifier(&quot;beanValidatingItemProcessor&quot;) BeanValidatingItemProcessor&lt;TestData&gt; processor) {
+        return stepBuilderFactory.get(&quot;beanValidatingItemProcessorStep&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(listItemReader)
+                .processor(processor)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;beanValidatingItemProcessor&quot;)
+    public BeanValidatingItemProcessor&lt;TestData&gt; beanValidatingItemProcessor() throws Exception {
+        BeanValidatingItemProcessor&lt;TestData&gt; processor = new BeanValidatingItemProcessor&lt;&gt;();
+        // 开启过滤，不符合规则的数据过滤掉
+        processor.setFilter(true);
+        processor.afterPropertiesSet();
+        return processor;
+    }
+
+}
+</div><p id="fe8a81b4_659">启动项目，执行上述代码，控制台日志打印如下：</p><div class="code-block" data-lang="java"         >
+2023-07-07 11:19:28.657  INFO 76796 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [beanValidatingItemProcessorStep]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+2023-07-07 11:19:28.727  INFO 76796 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [beanValidatingItemProcessorStep] executed in 69ms
+</div><p id="fe8a81b4_661">可以看到，不符合规则的数据已经被排除掉了。如果不开启过滤 <code class="code" id="fe8a81b4_662">processor.setFilter(false);</code> 那么遇到不符合注解规则的数据，则会抛出如下异常：</p><div class="code-block" data-lang="java"         >
+org.springframework.batch.item.validator.ValidationException: Validation failed for TestData{id=3, field1='21', field2='22', field3=''}: 
+Field error in object 'item' on field 'field3': rejected value []; codes [NotBlank.item.field3,NotBlank.field3,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [item.field3,field3]; arguments []; default message [field3]]; default message [不能为空]
+	at org.springframework.batch.item.validator.SpringValidator.validate(SpringValidator.java:54) ~[spring-batch-infrastructure-4.3.8.jar:4.3.8]
+	at org.springframework.batch.item.validator.ValidatingItemProcessor.process(ValidatingItemProcessor.java:84) ~[spring-batch-infrastructure-4.3.8.jar:4.3.8]
+</div></section><section class="chapter"><h2 id="fe8a81b4_664" data-toc="fe8a81b4_664"   >数据过滤</h2><p id="fe8a81b4_665">通过自定的 <code class="code" id="fe8a81b4_666">ItemProcessor</code> 是实现类，实现简单的数据过滤。新建测试类 <code class="code" id="fe8a81b4_667">TestDataFilterItemProcessorDemo</code> 测试数据过滤</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 数据过滤测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Configuration
+public class TestDataFilterItemProcessorDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ListItemReader&lt;TestData&gt; listItemReader;
+
+    @Bean
+    public Job testDataFilterItemProcessorJob(@Qualifier(&quot;testDataFilterItemProcessorStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;testDataFilterItemProcessorJob&quot; + System.currentTimeMillis())
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;testDataFilterItemProcessorStep&quot;)
+    public Step testDataFilterItemProcessorStep(@Qualifier(&quot;testDataFilterItemProcessor&quot;) ItemProcessor&lt;TestData, TestData&gt; processor) {
+        return stepBuilderFactory.get(&quot;testDataFilterItemProcessorStep&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(listItemReader)
+                .processor(processor)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    /**
+     * 注册一个自定义的扩展点 用于在输出之前处理数据
+     *
+     * @return ItemProcessor
+     */
+    @Bean(&quot;testDataFilterItemProcessor&quot;)
+    public ItemProcessor&lt;TestData, TestData&gt; testDataFilterItemProcessor() {
+        return item -&gt; &quot;&quot;.equals(item.getField3()) ? null : item;
+    }
+}
+</div><p id="fe8a81b4_669">上述代码 testDataFilterItemProcessor() 函数注册了一个 ItemProcessor，通过 process() 方法实现具体的数据过滤逻辑。判断若是 field3 字段是否为空则返回 null，返回 null 就会过滤掉这条数据。</p><p id="fe8a81b4_670">启动项目，控制台日志如下：</p><div class="code-block" data-lang="java"         >
+2023-07-07 14:47:05.186  INFO 67388 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [testDataFilterItemProcessorStep]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+2023-07-07 14:47:05.205  INFO 67388 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [testDataFilterItemProcessorStep] executed in 19ms
+</div></section><section class="chapter"><h2 id="fe8a81b4_672" data-toc="fe8a81b4_672"   >数据转换</h2><p id="fe8a81b4_673">新建数据转换测试类 <code class="code" id="fe8a81b4_674">TestDataTransformItemProcessorDemo</code> 用于测试数据转换</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 数据转换测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Configuration
+public class TestDataTransformItemProcessorDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ListItemReader&lt;TestData&gt; listItemReader;
+
+    @Bean
+    public Job testDataTransformItemProcessorJob(@Qualifier(&quot;testDataTransformItemProcessorStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;testDataTransformItemProcessorJob&quot; + System.currentTimeMillis())
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;testDataTransformItemProcessorStep&quot;)
+    public Step testDataTransformItemProcessorStep(@Qualifier(&quot;testDataTransformItemProcessor&quot;) ItemProcessor&lt;TestData, TestData&gt; processor) {
+        return stepBuilderFactory.get(&quot;testDataTransformItemProcessor&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(listItemReader)
+                .processor(processor)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    /**
+     * 注册一个自定义的扩展点 用于在输出之前处理数据
+     *
+     * @return ItemProcessor
+     */
+    @Bean(&quot;testDataTransformItemProcessor&quot;)
+    public ItemProcessor&lt;TestData, TestData&gt; testDataTransformItemProcessor() {
+        return item -&gt; {
+            item.setField1(item.getField1() + &quot;--Wick&quot;);
+            return item;
+        };
+    }
+}
+</div><p id="fe8a81b4_676">上述代码用于将读取到的数据通过 <code class="code" id="fe8a81b4_677">ItemProcessor</code> 实现自定义扩展点，将 <code class="code" id="fe8a81b4_678">field1</code> 字段追加上 <code class="code" id="fe8a81b4_679">--Wick</code> 字符串，并输出，代码运行结果如下：</p><div class="code-block" data-lang="java"         >
+2023-07-07 15:11:02.509  INFO 92788 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [testDataTransformItemProcessor]
+TestData{id=1, field1='11--Wick', field2='12', field3='13'}
+TestData{id=2, field1='21--Wick', field2='22', field3='23'}
+TestData{id=3, field1='21--Wick', field2='22', field3=''}
+2023-07-07 15:11:02.530  INFO 92788 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [testDataTransformItemProcessor] executed in 21ms
+</div></section><section class="chapter"><h2 id="fe8a81b4_681" data-toc="fe8a81b4_681"   >聚合处理</h2><p id="fe8a81b4_682">在创建 Step 的时候，除了制定一个 <code class="code" id="fe8a81b4_683">ItemProcess</code> 之外，还可以通过 <code class="code" id="fe8a81b4_684">CompositeItemProcessor</code> 组合多个 <code class="code" id="fe8a81b4_685">processor</code> 处理过程，新建 <code class="code" id="fe8a81b4_686">CompositeItemProcessorDemo</code> 测试类用于测试 <code class="code" id="fe8a81b4_687">processor</code> 组合处理。</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 聚合处理测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-07-07
+ */
+@Configuration
+public class CompositeItemProcessorDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ListItemReader&lt;TestData&gt; listItemReader;
+
+    @Bean
+    public Job compositeItemProcessorJob(@Qualifier(&quot;compositeItemProcessorStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;compositeItemProcessorJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;compositeItemProcessorStep&quot;)
+    public Step compositeItemProcessorStep(@Qualifier(&quot;compositeItemProcessor&quot;) ItemProcessor&lt;TestData, TestData&gt; processor) {
+        return stepBuilderFactory.get(&quot;compositeItemProcessorStep&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(listItemReader)
+                .processor(processor)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    /**
+     * 注册一个自定义的扩展点 用于在输出之前处理数据
+     *
+     * @return ItemProcessor
+     */
+    @Bean(&quot;compositeItemProcessor&quot;)
+    public CompositeItemProcessor&lt;TestData, TestData&gt; compositeItemProcessor(
+            @Qualifier(&quot;testDataFilterItemProcessor&quot;) ItemProcessor&lt;TestData, TestData&gt; item1,
+            @Qualifier(&quot;testDataTransformItemProcessor&quot;) ItemProcessor&lt;TestData, TestData&gt; item2) throws Exception {
+        CompositeItemProcessor&lt;TestData, TestData&gt; processor = new CompositeItemProcessor&lt;&gt;();
+
+        processor.setDelegates(Arrays.asList(item1, item2));
+        processor.afterPropertiesSet();
+        return processor;
+    }
+}
+</div><p id="fe8a81b4_689">上述代码通过 <code class="code" id="fe8a81b4_690">CompositeItemProcessor</code> 组合了前面定义的两个 processor， <a href="https://www.notion.so/de748a4374f34957a9eec2e3c474a349?pvs=21" id="fe8a81b4_691"   data-external="true" rel="noopener noreferrer" >数据过滤</a> 和 <a href="https://www.notion.so/de748a4374f34957a9eec2e3c474a349?pvs=21" id="fe8a81b4_692"   data-external="true" rel="noopener noreferrer" >数据转换</a> ，项目启动控制台打印如下：</p><div class="code-block" data-lang="java"         >
+2023-07-07 15:29:46.483  INFO 21092 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [compositeItemProcessorStep]
+TestData{id=1, field1='11--Wick', field2='12', field3='13'}
+TestData{id=2, field1='21--Wick', field2='22', field3='23'}
+2023-07-07 15:29:46.503  INFO 21092 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [compositeItemProcessorStep] executed in 20ms
+</div><p id="fe8a81b4_694">从结果可以看到，数据不但进行了过滤，还进行了转换（拼接 <code class="code" id="fe8a81b4_695">--Wick</code>）。</p></section><div class="last-modified"> Last modified: 24 一月 2024</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">  <a class="navigation-links__prev" href="输出数据.html">输出数据</a>   <a class="navigation-links__next" href="监听器.html">监听器</a>  </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.js"></script></body></html>

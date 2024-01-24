@@ -1,0 +1,695 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2024-01-24T10:09:25.1900012"><meta name="build-number" content="${buildNumber}">       <title>读取数据 | Spring Batch</title><script id="virtual-toc-data" type="application/json">[{"id":"3ec55e4c_2480","level":0,"title":"项目创建","anchor":"#3ec55e4c_2480"},{"id":"3ec55e4c_2485","level":0,"title":"启动类","anchor":"#3ec55e4c_2485"},{"id":"3ec55e4c_2490","level":0,"title":"数据库准备","anchor":"#3ec55e4c_2490"},{"id":"3ec55e4c_2493","level":0,"title":"项目配置","anchor":"#3ec55e4c_2493"},{"id":"3ec55e4c_2500","level":0,"title":"简单文本读取","anchor":"#3ec55e4c_2500"},{"id":"3ec55e4c_2531","level":0,"title":"文本数据读取","anchor":"#3ec55e4c_2531"},{"id":"3ec55e4c_2560","level":0,"title":"数据库读取","anchor":"#3ec55e4c_2560"},{"id":"xml","level":0,"title":"XML 数据读取","anchor":"#xml"},{"id":"3ec55e4c_2585","level":0,"title":"注意","anchor":"#3ec55e4c_2585"},{"id":"json","level":0,"title":"Json 数据读取","anchor":"#json"},{"id":"3ec55e4c_2602","level":0,"title":"多文本数据读取","anchor":"#3ec55e4c_2602"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="读取数据 | Spring Batch"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Spring Batch Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="读取数据.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="读取数据 | Spring Batch"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "读取数据.html#webpage", "url": "读取数据.html", "name": "读取数据 | Spring Batch", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Spring Batch Help" }</script><!-- End Schema.org --></head>      <body data-id="读取数据" data-main-title="读取数据" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Spring Batch  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="读取数据"   id="读取数据.md">读取数据</h1>  <p id="3ec55e4c_2473">Spring Bacch 读取数据通过 <code class="code" id="3ec55e4c_2474">org.springframework.batch.item.ItemReader</code> 接口的实现类来完成，包括 <code class="code" id="3ec55e4c_2475">org.springframework.batch.item.file.FlatFileItemReader</code> 文本数据读取， <code class="code" id="3ec55e4c_2476">org.springframework.batch.item.xml.StaxEventItemReader</code> XML 文件读取、 <code class="code" id="3ec55e4c_2477">org.springframework.batch.item.json.JsonItemReader</code> JSON文件数据读取、 <code class="code" id="3ec55e4c_2478">org.springframework.batch.item.json.JdbcPagingItemReader</code> 数据库分页数据读取等实现，更多实现类可以参考 <a href="https://docs.spring.io/spring-batch/docs/4.2.x/reference/html/appendix.html#itemReadersAppendix" id="3ec55e4c_2479"   data-external="true" rel="noopener noreferrer" >Spring 官方文档</a>。</p><section class="chapter"><h2 id="3ec55e4c_2480" data-toc="3ec55e4c_2480"   >项目创建</h2><p id="3ec55e4c_2481">新建一个 Spring Boot 项目 版本为 <code class="code" id="3ec55e4c_2482">2.7.12-SNAPSHOT</code> ，项目名称为： <code class="code" id="3ec55e4c_2483">spring-boot-batch-reader</code> ，Maven 依赖项如下：</p><div class="code-block" data-lang="markup"         >
+		&lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-batch&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;mysql&lt;/groupId&gt;
+            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+            &lt;version&gt;8.0.32&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.batch&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-batch-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+</div></section><section class="chapter"><h2 id="3ec55e4c_2485" data-toc="3ec55e4c_2485"   >启动类</h2><p id="3ec55e4c_2486"><code class="code" id="3ec55e4c_2487">Spring Boot</code> 启动类添加 <code class="code" id="3ec55e4c_2488">@EnableBatchProcessing</code></p><div class="code-block" data-lang="java"         >
+@EnableBatchProcessing
+@SpringBootApplication
+public class AppApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
+    }
+
+}
+</div></section><section class="chapter"><h2 id="3ec55e4c_2490" data-toc="3ec55e4c_2490"   >数据库准备</h2><p id="3ec55e4c_2491">准备一个 MySQL 数据库，用于持久化 Spring Batch 的任务，新建一个数据库，数据库命名为 <code class="code" id="3ec55e4c_2492">spring_batch_test</code> 并导入 Spring Batch 所用到的数据表，org.springframework.batch.core目录下的schema-mysql.sql文件：</p></section><section class="chapter"><h2 id="3ec55e4c_2493" data-toc="3ec55e4c_2493"   >项目配置</h2><p id="3ec55e4c_2494">配置项目的数据库连接信息如下：</p><div class="code-block" data-lang="yaml"         >
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/spring_batch_test
+    username: root
+    password: liao
+</div><p id="3ec55e4c_2496">接着在Spring Boot的入口类上添加 <code class="code" id="3ec55e4c_2497">@EnableBatchProcessing</code>注解，表示开启Spring Batch批处理功能：</p><div class="code-block" data-lang="java"         >
+@SpringBootApplication
+@EnableBatchProcessing
+public class SpringBootBatchApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootBatchApplication.class, args);
+    }
+}
+</div><p id="3ec55e4c_2499">至此，基本框架搭建好了，下面开始配置一个简单的任务。</p></section><section class="chapter"><h2 id="3ec55e4c_2500" data-toc="3ec55e4c_2500"   >简单文本读取</h2><p id="3ec55e4c_2501">由于 Spring Batch 读取数据是通过是通过 <code class="code" id="3ec55e4c_2502">ItemReader</code> 接口实现的，所以我们可以自定义一个 <code class="code" id="3ec55e4c_2503">ItmeReader</code> 的实现类，实现简单的文本读取，代码如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.reader;
+
+/**
+ * &lt;p&gt;
+ * 自定义 ItemReader 读取
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-05-18
+ */
+public class MySimpleItemReader implements ItemReader&lt;String&gt; {
+
+    private final Iterator&lt;String&gt; iterator;
+
+    public MySimpleItemReader(List&lt;String&gt; data) {
+        iterator = data.iterator();
+    }
+
+    @Override
+    public String read() {
+        // 依次读取数据
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+}
+</div><p id="3ec55e4c_2505">ItemReader 接口类的泛型用于指定读取数据的格式，这里是读取<code class="code" id="3ec55e4c_2506">List&lt;String&gt;</code> ，read() 主要是依次遍历迭代器中的数据。</p><p id="3ec55e4c_2507">接下来就是简单数据读取的任务测试，新建一个任务类如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 简单数据读取测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-05-18
+ */
+@Configuration
+public class MySimpleItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job job(@Qualifier(&quot;mySimpleItemReaderJob1&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;mySimpleItemReaderJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;mySimpleItemReaderJob1&quot;)
+    public Step step(@Qualifier(&quot;mySimpleItemReader&quot;) ItemReader&lt;String&gt; itemReader) {
+        return stepBuilderFactory.get(&quot;step01&quot;)
+                .&lt;String, String&gt;chunk(2)
+                .reader(itemReader)
+                .writer(list -&gt; list.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;mySimpleItemReader&quot;)
+    public ItemReader&lt;String&gt; mySimpleItemReader() {
+        List&lt;String&gt; data = Arrays.asList(&quot;java&quot;, &quot;c++&quot;, &quot;javascript&quot;, &quot;python&quot;);
+        return new MySimpleItemReader(data);
+    }
+}
+</div><p id="3ec55e4c_2509">上述代码在 <code class="code" id="3ec55e4c_2510">mySimpleItemReader()</code> 方法内，创建了一个 <code class="code" id="3ec55e4c_2511">List&lt;String&gt;</code> 集合，并传入给一个新建的 <code class="code" id="3ec55e4c_2512">MySimpleItemReader</code> 对象，返回了一个 <code class="code" id="3ec55e4c_2513">ItemReader&lt;String&gt;</code> 对象。</p><p id="3ec55e4c_2514">在函数 <code class="code" id="3ec55e4c_2515">step()</code> ，中通过 <code class="code" id="3ec55e4c_2516">chunk()</code> ，创建步骤 <code class="code" id="3ec55e4c_2517">Step</code>， <code class="code" id="3ec55e4c_2518">chunk</code> 在字面上是 块 的意思，这里可以理解成数据块，这里的泛型 <code class="code" id="3ec55e4c_2519">&lt;String, String&gt;</code> 用于指定 <span class="control" id="3ec55e4c_2520">读取的数据类型</span> 和 <span class="control" id="3ec55e4c_2521">输出的数据类型</span> ，构造器入参指定了数据块的大小，比如上述代码指定为 <code class="code" id="3ec55e4c_2522">2</code> 则表示每当读取 <code class="code" id="3ec55e4c_2523">2</code> 组数据做一次数据输出处理。接着 <code class="code" id="3ec55e4c_2524">read()</code> 指定读取数据的方式，该方法接收 <code class="code" id="3ec55e4c_2525">ItemReader</code> 的实现类，这里使用的是自定义的实现类 <code class="code" id="3ec55e4c_2526">MySimpleItemReader</code>， <code class="code" id="3ec55e4c_2527">writer()</code> 指定数据的输出方式，这里简单使用 <code class="code" id="3ec55e4c_2528">forEach</code> 将数据打印到控制台。</p><p id="3ec55e4c_2529">启动项目，控制台打印如下</p><div class="code-block" data-lang="java"         >
+2023-05-18 15:44:21.672  INFO 20724 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step01]
+java
+c++
+javascript
+python
+2023-05-18 15:44:21.699  INFO 20724 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [step01] executed in 26ms
+</div></section><section class="chapter"><h2 id="3ec55e4c_2531" data-toc="3ec55e4c_2531"   >文本数据读取</h2><p id="3ec55e4c_2532"><code class="code" id="3ec55e4c_2533">Spring Batch</code> 文本数据读取需要通过 <code class="code" id="3ec55e4c_2534">FlatFileItemReader</code> 实现，首先需要准备好数据文件。</p><p id="3ec55e4c_2535">在项目 <code class="code" id="3ec55e4c_2536">resources</code> 目录下新建名为 <code class="code" id="3ec55e4c_2537">read_test_file.txt</code> 的文件，并在其中加入内容：</p><div class="code-block" data-lang="java"         >
+// 文本读取数据测试
+1,11,12,13
+2,21,22,23
+3,31,32,33
+4,41,42,43
+5,51,52,53
+6,61,62,63
+</div><p id="3ec55e4c_2539">测试文件中的数据是以逗号进行分割的。在文本数据的读取中，需要将读取的文本数据转为实体类对象，所以需要创建一个实体类：</p><div class="code-block" data-lang="java"         >
+package com.liao.entity;
+
+/**
+ * &lt;p&gt;
+ * 文本数据读取实体映射类
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-05-18
+ */
+public class TestData {
+
+    private int id;
+    private String field1;
+    private String field2;
+    private String field3;
+
+    ... set get toString
+}
+</div><p id="3ec55e4c_2541">创建好实体类之后，创建任务类进行测试：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 文本数据读取测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-05-18
+ */
+@Configuration
+public class FileItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job fileItemReaderJob(@Qualifier(&quot;fileItemReaderStep01&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;fileItemReaderJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;fileItemReaderStep01&quot;)
+    public Step step01(@Qualifier(&quot;fileItemReader&quot;) ItemReader&lt;TestData&gt; itemReader) {
+        return stepBuilderFactory.get(&quot;fileItemReaderStep01&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(itemReader)
+                .writer(list -&gt; list.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;fileItemReader&quot;)
+    public ItemReader&lt;TestData&gt; fileItemReader() {
+        FlatFileItemReader&lt;TestData&gt; reader = new FlatFileItemReader&lt;&gt;();
+        // 设置文件资源地址
+        reader.setResource(new ClassPathResource(&quot;read_test_file.txt&quot;));
+        // 跳过第一行
+        reader.setLinesToSkip(1);
+
+        // DelimitedLineTokenizer 是 AbstractLineTokenizer 三个实现类之一
+        // 默认构造器使用 &ldquo;,&rdquo; 逗号作为分隔符，也可以用过构造器指定分隔符
+        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+
+        // 设置属性名
+        tokenizer.setNames(&quot;id&quot;, &quot;field1&quot;, &quot;field2&quot;, &quot;field3&quot;);
+
+        // 将每一行数据转为 TestData
+        DefaultLineMapper&lt;TestData&gt; mapper = new DefaultLineMapper&lt;&gt;();
+        // 设置 tokenizer
+        mapper.setLineTokenizer(tokenizer);
+
+        // 将数据映射为 TestData 对象
+        mapper.setFieldSetMapper(fieldSet -&gt; {
+            TestData testData = new TestData();
+            testData.setId(fieldSet.readInt(&quot;id&quot;));
+            testData.setField1(fieldSet.readString(&quot;field1&quot;));
+            testData.setField2(fieldSet.readString(&quot;field2&quot;));
+            testData.setField3(fieldSet.readString(&quot;field3&quot;));
+            return testData;
+        });
+
+        reader.setLineMapper(mapper);
+
+        return reader;
+    }
+}
+</div><p id="3ec55e4c_2543">上述代码在 <code class="code" id="3ec55e4c_2544">fileItemReader()</code> 函数中实现了具体的文本读取逻辑，具体过程参考代码</p><p id="3ec55e4c_2545"><code class="code" id="3ec55e4c_2546">DelimitedLineTokenizer</code> 类的默认构造器如下所示</p><div class="code-block" data-lang="java"         >
+package org.springframework.batch.item.file.transform;
+
+public class DelimitedLineTokenizer extends AbstractLineTokenizer
+	implements InitializingBean {
+
+	public static final String DELIMITER_COMMA = &quot;,&quot;;
+
+	/**
+	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the
+	 * common case where the delimiter is a {@link #DELIMITER_COMMA comma}.
+	 *
+	 * @see #DelimitedLineTokenizer(String)
+	 * @see #DELIMITER_COMMA
+	 */
+	public DelimitedLineTokenizer() {
+		this(DELIMITER_COMMA);
+	}
+}
+</div><p id="3ec55e4c_2548">默认的构造器使用了一个名为 <code class="code" id="3ec55e4c_2549">DELIMITER_COMMA</code> 常量，常量的值为 &quot;,&quot; 。若是需要使用其他符号作为分隔符，如 &ldquo; | &rdquo; 作为分割符，也可以手动指定，如下所示：</p><div class="code-block" data-lang="java"         >
+DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer(&quot;|&quot;);
+
+</div><p id="3ec55e4c_2551"><code class="code" id="3ec55e4c_2552">DelimitedLineTokenizer</code> 是 <code class="code" id="3ec55e4c_2553">AbstractLineTokenizer</code> 三个实现类之一：</p><figure  id="3ec55e4c_2554"><img alt="Untitled" src="https://s3-us-west-2.amazonaws.com/secure.notion-static.com/24e16056-9a38-4d99-b072-afb488ad7f25/Untitled.png" title="Untitled"   ></figure><p id="3ec55e4c_2555"><code class="code" id="3ec55e4c_2556">FixedLengthTokenizer</code> 通过指定长度来截取数据， <code class="code" id="3ec55e4c_2557">RegexLineTokenizer</code> 根据正则表达式来截取。</p><p id="3ec55e4c_2558">执行项目，控制台打印如下</p><div class="code-block" data-lang="java"         >
+2023-05-25 16:09:35.080  INFO 15536 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [fileItemReaderStep01]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+TestData{id=3, field1='31', field2='32', field3='33'}
+TestData{id=4, field1='41', field2='42', field3='43'}
+TestData{id=5, field1='51', field2='52', field3='53'}
+TestData{id=6, field1='61', field2='62', field3='63'}
+2023-05-25 16:09:35.130  INFO 15536 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [fileItemReaderStep01] executed in 50ms
+</div></section><section class="chapter"><h2 id="3ec55e4c_2560" data-toc="3ec55e4c_2560"   >数据库读取</h2><p id="3ec55e4c_2561">首先在 MySQL 中创新建一个数据表，并插入测试数据，用于测试，SQL 语句如下：</p><div class="code-block" data-lang="sql"         >
+-- ----------------------------
+-- Table structure for TEST
+-- ----------------------------
+DROP TABLE IF EXISTS `TEST`;
+CREATE TABLE `TEST` (
+  `id` bigint(10) NOT NULL COMMENT 'ID',
+  `field1` varchar(10) NOT NULL COMMENT '字段一',
+  `field2` varchar(10) NOT NULL COMMENT '字段二',
+  `field3` varchar(10) NOT NULL COMMENT '字段三',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of TEST
+-- ----------------------------
+BEGIN;
+INSERT INTO `TEST` VALUES (1, '11', '12', '13');
+INSERT INTO `TEST` VALUES (2, '21', '22', '23');
+INSERT INTO `TEST` VALUES (3, '31', '32', '33');
+INSERT INTO `TEST` VALUES (4, '41', '42', '43');
+INSERT INTO `TEST` VALUES (5, '51', '52', '53');
+INSERT INTO `TEST` VALUES (6, '61', '62', '63');
+COMMIT;
+</div><p id="3ec55e4c_2563">测试表的字段与上面测试的实体类 <a href="https://www.notion.so/e2382546ec63444c92618dd8b1217a33?pvs=21" id="3ec55e4c_2564"   data-external="true" rel="noopener noreferrer" >TestData</a> 保持一致</p><p id="3ec55e4c_2565">然后创建任务类进行测试，代码如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 数据库数据读取测试
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-05-25
+ */
+@Configuration
+public class DataSourceItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    // 注入数据源
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean
+    public Job dataSourceItemReaderJob(@Qualifier(&quot;dataSourceItemReaderStep&quot;) Step step1) {
+        return jobBuilderFactory.get(&quot;dataSourceItemReaderStep&quot;).start(step1).build();
+    }
+
+    @Bean(&quot;dataSourceItemReaderStep&quot;)
+    public Step dataSourceItemReaderStep(@Qualifier(&quot;dataSourceItemReader&quot;) ItemReader&lt;TestData&gt; dataSourceItemReader) {
+        return stepBuilderFactory.get(&quot;dataSourceItemReaderStep&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(dataSourceItemReader)
+                .writer(items -&gt; items.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;dataSourceItemReader&quot;)
+    public ItemReader&lt;TestData&gt; dataSourceItemReader() {
+        JdbcPagingItemReader&lt;TestData&gt; reader = new JdbcPagingItemReader&lt;&gt;();
+        // 设置数据源
+        reader.setDataSource(dataSource);
+        // 设置每次读取的大小
+        reader.setFetchSize(2);
+        // 设置页码大小
+        reader.setPageSize(2);
+
+        // 设置 SQL 查询语句
+        MySqlPagingQueryProvider provider = new MySqlPagingQueryProvider();
+        // 设置查询字段
+        provider.setSelectClause(&quot;id,field1,field2,field3&quot;);
+        // 设置查询表
+        provider.setFromClause(&quot;from TEST&quot;);
+
+        // 将读取到的数据转为对象
+        reader.setRowMapper(((rs, rowNum) -&gt; {
+            TestData testData = new TestData();
+            testData.setId(rs.getInt(1));
+            testData.setField1(rs.getString(2));
+            testData.setField2(rs.getString(3));
+            testData.setField3(rs.getString(4));
+
+            return testData;
+        }));
+
+        // 设置排序根据 id 排序
+        Map&lt;String, Order&gt; sort = new HashMap&lt;&gt;();
+        sort.put(&quot;id&quot;, Order.ASCENDING);
+        provider.setSortKeys(sort);
+        
+        reader.setQueryProvider(provider);
+
+        // 设置namedParameterJdbcTemplate等属性
+        try {
+            reader.afterPropertiesSet();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return reader;
+    }
+}
+</div><p id="3ec55e4c_2567">上述代码的步骤是，通过 JdbcPagingItemReader 设置数据源，然后设置数据量、获取数据的 SQL 语句、排序规则和查询结果与实体类映射规则。结尾调用 <code class="code" id="3ec55e4c_2568">JdbcPagingItemReader</code> 的 <code class="code" id="3ec55e4c_2569">afterPropertiesSet()</code> 函数是用于设置 JDBC 模板。 <code class="code" id="3ec55e4c_2570">afterPropertiesSet()</code> 源码如下：</p><div class="code-block" data-lang="java"         >
+/**
+	 * Check mandatory properties.
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		Assert.notNull(dataSource, &quot;DataSource may not be null&quot;);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		if (fetchSize != VALUE_NOT_SET) {
+			jdbcTemplate.setFetchSize(fetchSize);
+		}
+		jdbcTemplate.setMaxRows(getPageSize());
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		Assert.notNull(queryProvider, &quot;QueryProvider may not be null&quot;);
+		queryProvider.init(dataSource);
+		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
+		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());
+	}
+</div><p id="3ec55e4c_2572">执行结果如下：</p><div class="code-block" data-lang="java"         >
+2023-06-01 16:53:12.217  INFO 18068 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [dataSourceItemReaderStep]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+TestData{id=3, field1='31', field2='32', field3='33'}
+TestData{id=4, field1='41', field2='42', field3='43'}
+TestData{id=5, field1='51', field2='52', field3='53'}
+TestData{id=6, field1='61', field2='62', field3='63'}
+2023-06-01 16:53:12.258  INFO 18068 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [dataSourceItemReaderStep] executed in 40ms
+</div></section><section class="chapter"><h2 id="xml" data-toc="xml"   >XML 数据读取</h2><p id="3ec55e4c_2574">Spring Batch 可以通过 Spring OXM 实现 xml 格式的数据读取。在 resources 目录下新建xml数据读取测试文件 <span class="control" id="3ec55e4c_2575"><code class="code" id="3ec55e4c_2576">read_test_file.xml</code></span> 如下所示：</p><div class="code-block" data-lang="markup"         >
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+&lt;tests&gt;
+    &lt;test&gt;
+        &lt;id&gt;1&lt;/id&gt;
+        &lt;field1&gt;11&lt;/field1&gt;
+        &lt;field2&gt;12&lt;/field2&gt;
+        &lt;field3&gt;13&lt;/field3&gt;
+    &lt;/test&gt;
+    &lt;test&gt;
+        &lt;id&gt;2&lt;/id&gt;
+        &lt;field1&gt;21&lt;/field1&gt;
+        &lt;field2&gt;22&lt;/field2&gt;
+        &lt;field3&gt;23&lt;/field3&gt;
+    &lt;/test&gt;
+    &lt;test&gt;
+        &lt;id&gt;3&lt;/id&gt;
+        &lt;field1&gt;31&lt;/field1&gt;
+        &lt;field2&gt;32&lt;/field2&gt;
+        &lt;field3&gt;33&lt;/field3&gt;
+    &lt;/test&gt;
+    &lt;test&gt;
+        &lt;id&gt;4&lt;/id&gt;
+        &lt;field1&gt;41&lt;/field1&gt;
+        &lt;field2&gt;42&lt;/field2&gt;
+        &lt;field3&gt;43&lt;/field3&gt;
+    &lt;/test&gt;
+    &lt;test&gt;
+        &lt;id&gt;5&lt;/id&gt;
+        &lt;field1&gt;51&lt;/field1&gt;
+        &lt;field2&gt;52&lt;/field2&gt;
+        &lt;field3&gt;53&lt;/field3&gt;
+    &lt;/test&gt;
+    &lt;test&gt;
+        &lt;id&gt;6&lt;/id&gt;
+        &lt;field1&gt;61&lt;/field1&gt;
+        &lt;field2&gt;62&lt;/field2&gt;
+        &lt;field3&gt;63&lt;/field3&gt;
+    &lt;/test&gt;
+&lt;/tests&gt;
+</div><p id="3ec55e4c_2578">xml 文件由一个 <code class="code" id="3ec55e4c_2579">tests</code> 根标签包裹若干个 <code class="code" id="3ec55e4c_2580">test</code> 标签， <code class="code" id="3ec55e4c_2581">test</code> 标签又包含四组标签，标签名称与 <code class="code" id="3ec55e4c_2582">TestData</code> 实体类属性对应。</p><p id="3ec55e4c_2583">准备好测试 xml 文件后，引入需要的 xml 依赖文件：</p><div class="code-block" data-lang="markup"         >
+				&lt;dependency&gt;
+            &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-oxm&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.thoughtworks.xstream&lt;/groupId&gt;
+            &lt;artifactId&gt;xstream&lt;/artifactId&gt;
+            &lt;version&gt;1.4.17&lt;/version&gt;
+        &lt;/dependency&gt;
+</div></section><section class="chapter"><h2 id="3ec55e4c_2585" data-toc="3ec55e4c_2585"   >注意</h2><p id="3ec55e4c_2586">上述依赖中 <code class="code" id="3ec55e4c_2587">xstream</code> 当版本高于 1.4.17 时，下述代码示例会报错，无法运行，暂未解决</p><p id="3ec55e4c_2588">新建 <code class="code" id="3ec55e4c_2589">XmlFileItemReaderDemo</code> xml 读取测试类：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 测试xml文件读取
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-06-02
+ */
+@Configuration
+public class XmlFileItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job xmlFileItemReaderJob(@Qualifier(&quot;xmlFileItemReaderStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;xmlFileItemReaderJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;xmlFileItemReaderStep&quot;)
+    public Step xmlFileItemReaderStep(@Qualifier(&quot;xmlFileItemReader&quot;) ItemReader&lt;TestData&gt; itemReader) {
+        return stepBuilderFactory.get(&quot;xmlFileItemReaderStep_01&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(itemReader)
+                .writer(dataList -&gt; dataList.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;xmlFileItemReader&quot;)
+    public ItemReader&lt;TestData&gt; xmlFileItemReader() {
+        StaxEventItemReader&lt;TestData&gt; reader = new StaxEventItemReader&lt;&gt;();
+        // 设置 xml 数据源
+        reader.setResource(new ClassPathResource(&quot;read_test_file.xml&quot;));
+        // 设置根标签
+        reader.setFragmentRootElementName(&quot;test&quot;);
+
+        // 将数据转为 TestData 对象
+        XStreamMarshaller marshaller = new XStreamMarshaller();
+
+        Map&lt;String, Class&lt;TestData&gt;&gt; map = new HashMap&lt;&gt;(1);
+        map.put(&quot;test&quot;, TestData.class);
+        marshaller.setAliases(map);
+
+        reader.setUnmarshaller(marshaller);
+
+        return reader;
+    }
+}
+</div><p id="3ec55e4c_2591">启动项目如下所示：</p><div class="code-block" data-lang="java"         >
+2023-06-05 14:09:01.655  INFO 26456 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [xmlFileItemReaderStep_01]
+Security framework of XStream not explicitly initialized, using predefined black list on your own risk.
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+TestData{id=3, field1='31', field2='32', field3='33'}
+TestData{id=4, field1='41', field2='42', field3='43'}
+TestData{id=5, field1='51', field2='52', field3='53'}
+TestData{id=6, field1='61', field2='62', field3='63'}
+2023-06-05 14:09:01.762  INFO 26456 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [xmlFileItemReaderStep_01] executed in 107ms
+</div></section><section class="chapter"><h2 id="json" data-toc="json"   >Json 数据读取</h2><p id="3ec55e4c_2593">在 resources 目录下新建xml数据读取测试文件 <span class="control" id="3ec55e4c_2594"><code class="code" id="3ec55e4c_2595">read_test_file.json</code></span> 如下所示：</p><div class="code-block" data-lang="json"         >
+[
+  {
+    &quot;id&quot;: 1,
+    &quot;field1&quot;: &quot;11&quot;,
+    &quot;field2&quot;: &quot;12&quot;,
+    &quot;field3&quot;: &quot;13&quot;
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;field1&quot;: &quot;21&quot;,
+    &quot;field2&quot;: &quot;22&quot;,
+    &quot;field3&quot;: &quot;23&quot;
+  },
+  {
+    &quot;id&quot;: 3,
+    &quot;field1&quot;: &quot;31&quot;,
+    &quot;field2&quot;: &quot;32&quot;,
+    &quot;field3&quot;: &quot;33&quot;
+  }
+]
+</div><p id="3ec55e4c_2597">新建 <code class="code" id="3ec55e4c_2598">XmlFileItemReaderDemo</code> json读取测试类：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 测试xml文件读取
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-06-02
+ */
+@Configuration
+public class XmlFileItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job xmlFileItemReaderJob(@Qualifier(&quot;xmlFileItemReaderStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;xmlFileItemReaderJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;xmlFileItemReaderStep&quot;)
+    public Step xmlFileItemReaderStep(@Qualifier(&quot;xmlFileItemReader&quot;) ItemReader&lt;TestData&gt; itemReader) {
+        return stepBuilderFactory.get(&quot;xmlFileItemReaderStep_01&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(itemReader)
+                .writer(dataList -&gt; dataList.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;xmlFileItemReader&quot;)
+    public ItemReader&lt;TestData&gt; xmlFileItemReader() {
+        StaxEventItemReader&lt;TestData&gt; reader = new StaxEventItemReader&lt;&gt;();
+        // 设置 xml 数据源
+        reader.setResource(new ClassPathResource(&quot;read_test_file.xml&quot;));
+        // 设置根标签
+        reader.setFragmentRootElementName(&quot;test&quot;);
+
+        // 将数据转为 TestData 对象
+        XStreamMarshaller marshaller = new XStreamMarshaller();
+
+        Map&lt;String, Class&lt;TestData&gt;&gt; map = new HashMap&lt;&gt;(1);
+        map.put(&quot;test&quot;, TestData.class);
+        marshaller.setAliases(map);
+
+        reader.setUnmarshaller(marshaller);
+
+        return reader;
+    }
+}
+</div><p id="3ec55e4c_2600">启动项目，控制台输出如下：</p><div class="code-block" data-lang="java"         >
+2023-06-05 15:42:43.578  INFO 4312 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [jsonItemReaderStep01]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+TestData{id=3, field1='31', field2='32', field3='33'}
+2023-06-05 15:42:43.620  INFO 4312 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [jsonItemReaderStep01] executed in 42ms
+</div></section><section class="chapter"><h2 id="3ec55e4c_2602" data-toc="3ec55e4c_2602"   >多文本数据读取</h2><p id="3ec55e4c_2603">在 <span class="control" id="3ec55e4c_2604">resources</span> 目录下新建xml数据读取测试文件 <code class="code" id="3ec55e4c_2605">**read_test_file.txt</code>** 和 ** <code class="code" id="3ec55e4c_2606">read_test_file_01.txt</code> <code class="code" id="3ec55e4c_2607">read_test_file.txt</code> **如下所示：</p><div class="code-block" data-lang="java"         >
+// 文本读取数据测试
+1,11,12,13
+2,21,22,23
+3,31,32,33
+4,41,42,43
+5,51,52,53
+6,61,62,63
+</div><p id="3ec55e4c_2609"><code class="code" id="3ec55e4c_2610">**read_test_file_01.txt</code>** 文件内容如下所示：</p><div class="code-block" data-lang="java"         >
+// 演示文件数据读取
+7,71,72,73
+8,81,82,83
+</div><p id="3ec55e4c_2612">新建 <code class="code" id="3ec55e4c_2613">MultiFileItemReaderDemo</code> 多文本读取测试类，代码如下：</p><div class="code-block" data-lang="java"         >
+package com.liao.job;
+
+/**
+ * &lt;p&gt;
+ * Spring Batch 多文件读取
+ * &lt;/p&gt;
+ *
+ * @author LiAo
+ * @since 2023-06-05
+ */
+@Configuration
+public class MultiFileItemReaderDemo {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public Job multiFileItemReaderJob(@Qualifier(&quot;multiFileItemReaderStep&quot;) Step step) {
+        return jobBuilderFactory.get(&quot;multiFileItemReaderJob&quot;)
+                .start(step)
+                .build();
+    }
+
+    @Bean(&quot;multiFileItemReaderStep&quot;)
+    public Step multiFileItemReaderStep(@Qualifier(&quot;multiFileItemReader&quot;) ItemReader&lt;TestData&gt; reader) {
+        return stepBuilderFactory.get(&quot;multiFileItemReaderStep&quot;)
+                .&lt;TestData, TestData&gt;chunk(2)
+                .reader(reader)
+                .writer(data -&gt; data.forEach(System.out::println))
+                .build();
+    }
+
+    @Bean(&quot;multiFileItemReader&quot;)
+    public ItemReader&lt;TestData&gt; multiFileItemReader(@Qualifier(&quot;multiFileItemReaderAgency&quot;) FlatFileItemReader&lt;TestData&gt; fileItemReader) {
+        MultiResourceItemReader&lt;TestData&gt; reader = new MultiResourceItemReader&lt;&gt;();
+
+        reader.setDelegate(fileItemReader);
+
+        Resource[] resources = {
+                new ClassPathResource(&quot;read_test_file.txt&quot;)
+                , new ClassPathResource(&quot;read_test_file_01.txt&quot;)
+        };
+
+        reader.setResources(resources);
+
+        return reader;
+    }
+
+    @Bean(&quot;multiFileItemReaderAgency&quot;)
+    public FlatFileItemReader&lt;TestData&gt; fileItemReaderAgency() {
+        FlatFileItemReader&lt;TestData&gt; reader = new FlatFileItemReader&lt;&gt;();
+
+        // 跳过第一行
+        reader.setLinesToSkip(1);
+
+        // DelimitedLineTokenizer 是 AbstractLineTokenizer 三个实现类之一
+        // 默认构造器使用 &ldquo;,&rdquo; 逗号作为分隔符，也可以用过构造器指定分隔符
+        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+
+        // 设置属性名
+        tokenizer.setNames(&quot;id&quot;, &quot;field1&quot;, &quot;field2&quot;, &quot;field3&quot;);
+
+        // 将每一行数据转为 TestData
+        DefaultLineMapper&lt;TestData&gt; mapper = new DefaultLineMapper&lt;&gt;();
+        // 设置 tokenizer
+        mapper.setLineTokenizer(tokenizer);
+
+        // 将数据映射为 TestData 对象
+        mapper.setFieldSetMapper(fieldSet -&gt; {
+            TestData testData = new TestData();
+            testData.setId(fieldSet.readInt(&quot;id&quot;));
+            testData.setField1(fieldSet.readString(&quot;field1&quot;));
+            testData.setField2(fieldSet.readString(&quot;field2&quot;));
+            testData.setField3(fieldSet.readString(&quot;field3&quot;));
+            return testData;
+        });
+
+        reader.setLineMapper(mapper);
+
+        return reader;
+    }
+}
+</div><p id="3ec55e4c_2615">多文件读取的关键在于 <code class="code" id="3ec55e4c_2616">multiFileItemReader()</code> 函数，函数通过 MultiResourceItemReader 对象设置了多个目标文件地址，并将 <code class="code" id="3ec55e4c_2617">fileItemReaderAgency()</code> 单文件读取方式设置为读取代理。</p><p id="3ec55e4c_2618">执行结果如下：</p><div class="code-block" data-lang="java"         >
+2023-06-05 16:02:44.807  INFO 3064 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [multiFileItemReaderStep]
+TestData{id=1, field1='11', field2='12', field3='13'}
+TestData{id=2, field1='21', field2='22', field3='23'}
+TestData{id=3, field1='31', field2='32', field3='33'}
+TestData{id=4, field1='41', field2='42', field3='43'}
+TestData{id=5, field1='51', field2='52', field3='53'}
+TestData{id=6, field1='61', field2='62', field3='63'}
+TestData{id=7, field1='71', field2='72', field3='73'}
+TestData{id=8, field1='81', field2='82', field3='83'}
+2023-06-05 16:02:44.861  INFO 3064 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [multiFileItemReaderStep] executed in 54ms
+</div></section><div class="last-modified"> Last modified: 24 一月 2024</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">  <a class="navigation-links__prev" href="java-double.html">开始吧</a>   <a class="navigation-links__next" href="输出数据.html">输出数据</a>  </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.6.6-b205/app.js"></script></body></html>
